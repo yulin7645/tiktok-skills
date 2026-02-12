@@ -1,11 +1,21 @@
 ---
 name: tiktok-collection-scraper
-description: Scrape TikTok user collection folders and their video links with metadata (plays, likes, comments, shares). Use when user asks to get/scrape/fetch/extract TikTok collections, favorites, saved videos, or collection folder contents for any TikTok account. Supports any user identifier — username, @username, profile URL, video URL, short link (vm.tiktok.com), user_id, or secUid. Zero external API dependency, only requires curl_cffi.
+version: 1.0.0
+description: Scrape TikTok user collection folders and their video links with full metadata (plays, likes, comments, shares). Use when user asks to get, scrape, fetch, extract, or download TikTok collections, favorites, saved videos, bookmarks, or collection folder contents for any TikTok account. Accepts any user identifier — username, @username, profile URL, video URL, short link (vm.tiktok.com), user_id, or secUid. Zero external API dependency, no paid service needed, only requires curl_cffi. Works without login cookies for public collections (~80% coverage). Also use for TikTok competitor analysis, content research, viral video discovery, or building video databases.
 ---
 
 # TikTok Collection Scraper
 
-Scrape all collection folders and videos for any TikTok user using `curl_cffi` only. No external APIs, no login cookie required for public collections.
+Batch extract TikTok user collection folders and their video links — including play counts, likes, comments, and shares. Zero external API, no paid service, just `curl_cffi`.
+
+## Features
+
+- 🔓 **No login required** — works without cookies for public collections (~80% coverage)
+- 🔑 **Full access with cookie** — get all collections including private ones (100%)
+- 🚀 **Zero external API** — only needs `curl_cffi`, no TikHub/RapidAPI/paid services
+- 📥 **7 input formats** — username, @username, profile URL, video URL, short link, user_id, secUid
+- 📊 **Rich metadata** — plays, likes, comments, shares per video
+- ⚡ **Fast** — 50 collections + 300 videos in ~40 seconds
 
 ## Prerequisites
 
@@ -20,21 +30,24 @@ pip install curl_cffi
 Run the bundled script. All paths below are relative to this skill's directory.
 
 ```bash
-# Guest mode (public collections, ~80% coverage)
+# Guest mode (public collections, no cookie needed)
 python3 scripts/scrape_collections.py <target> -o /tmp/result.json
 
 # Login mode (all collections, 100% coverage)
 python3 scripts/scrape_collections.py <target> --cookie /path/to/cookie.txt -o /tmp/result.json
 ```
 
-`<target>` accepts any of:
-- `chengfeng_yulin` — username
-- `@chengfeng_yulin` — @username
-- `https://www.tiktok.com/@user` — profile URL
-- `https://www.tiktok.com/@user/video/123` — video URL (resolves to video author)
-- `https://vm.tiktok.com/xxx` — short link
-- `6811802142106764293` — user_id (numeric, >10 digits)
-- `MS4wLjABAAAA...` — secUid direct
+### Supported Input Formats
+
+| Format | Example |
+|--------|---------|
+| Username | `chengfeng_yulin` |
+| @Username | `@chengfeng_yulin` |
+| Profile URL | `https://www.tiktok.com/@chengfeng_yulin` |
+| Video URL | `https://www.tiktok.com/@user/video/7602514407133941000` |
+| Short link | `https://vm.tiktok.com/ZMkVKQxsb/` |
+| User ID | `6811802142106764293` |
+| secUid | `MS4wLjABAAAA...` |
 
 ## Output Format
 
@@ -79,13 +92,17 @@ JSON with structure:
 - **Needed** for private collections (status=1) — must be the target account's own login cookie
 - Cookie format: raw cookie string from browser (semicolon-separated key=value pairs)
 
-## Key Technical Details
+## How It Works
 
-See `references/api-notes.md` for full API documentation. Critical points:
+Uses TikTok's internal web APIs with `curl_cffi` for Chrome TLS fingerprint impersonation:
 
-- `sourceType=113` is the essential undocumented parameter for `item_list` API
-- `curl_cffi` with `impersonate='chrome'` bypasses TikTok's TLS fingerprint detection
-- Status field is counter-intuitive: `status=3` = public, `status=1` = private
+1. **Resolve user** — any input format → `secUid` (via TikTok's own redirects and page parsing)
+2. **Fetch collections** — `GET /api/user/collection_list/` (no auth needed)
+3. **Fetch videos** — `GET /api/collection/item_list/` with `sourceType=113` (the undocumented key parameter)
+
+> `sourceType=113` is an undocumented parameter discovered through browser request interception. Without it, the API returns success with empty results.
+
+See `references/api-notes.md` for full API documentation.
 
 ## Error Handling
 

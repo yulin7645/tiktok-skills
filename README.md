@@ -1,7 +1,8 @@
 <h1 align="center">🎵 TikTok Skills</h1>
 
 <p align="center">
-  Agent skills for TikTok data extraction. Zero external API dependency.
+  Agent skills for TikTok data extraction — collections, videos, metadata.<br/>
+  Zero external API. Zero paid services. Just <code>curl_cffi</code>.
 </p>
 
 <p align="center">
@@ -24,17 +25,17 @@
 npx skills add yulin7645/tiktok-skills
 ```
 
-Works with **39 agents** including Claude Code, OpenClaw, Cursor, Copilot, Windsurf, Cline, Codex, Gemini CLI, and more.
+Works with **39+ agents** including Claude Code, OpenClaw, Cursor, Copilot, Windsurf, Cline, Codex, Gemini CLI, and more.
 
 ## Available Skills
 
 | Skill | Description |
 |-------|-------------|
-| [tiktok-collection-scraper](tiktok-collection-scraper/) | Scrape all collection folders and videos for any TikTok user with full metadata |
+| [tiktok-collection-scraper](tiktok-collection-scraper/) | Batch extract collection folders and videos with full metadata |
 
 ## tiktok-collection-scraper
 
-Batch extract TikTok user collection folders and their video links — including play counts, likes, comments, and shares.
+Batch extract TikTok user collection folders and their video links — including play counts, likes, comments, and shares. Perfect for competitor analysis, content research, and viral video discovery.
 
 ### Features
 
